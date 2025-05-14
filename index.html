@@ -24,7 +24,20 @@
       color: #444;
       margin-bottom: 2rem;
     }
-    p {
+    nav {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    nav a {
+      margin-right: 20px;
+      text-decoration: none;
+      color: blue;
+      font-size: 1.2rem;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+    .content {
       font-size: 1rem;
       margin-top: 3rem;
       text-align: center;
@@ -32,8 +45,40 @@
   </style>
 </head>
 <body>
+
+  <!-- Header Section -->
   <h1>Woozy's Website</h1>
   <h2>Software Developer, Artist, Game Enthusiast</h2>
-  <p>Hello World!</p>
+
+  <!-- Navigation Links -->
+  <nav>
+    <a onclick="showContent('home')">Home</a>
+    <a onclick="showContent('about')">About Me</a>
+    <a onclick="showContent('games')">Games</a>
+    <a onclick="showContent('art')">Art</a>
+  </nav>
+
+  <!-- Content Section -->
+  <div id="content" class="content">
+    <p>Hello World!</p>
+  </div>
+
+  <script>
+    function showContent(section) {
+      const content = document.getElementById('content');
+      
+      // Change the content based on the clicked section
+      if (section === 'home') {
+        content.innerHTML = '<p>Hello World!</p>';
+      } else if (section === 'about') {
+        content.innerHTML = '<p>[Text]</p>';
+      } else if (section === 'games') {
+        content.innerHTML = '<p>[Text]</p>';
+      } else if (section === 'art') {
+        content.innerHTML = '<p>[Under Construction]</p>';
+      }
+    }
+  </script>
+
 </body>
 </html>
