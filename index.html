@@ -50,6 +50,22 @@
     }
 
     /* Game styles */
+    .game-title {
+      font-family: 'Courier New', monospace;
+      font-size: 1.8rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      color: white;
+      position: relative;
+    }
+    .blinking-cursor::after {
+      content: '_';
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      from, to { opacity: 0; }
+      50% { opacity: 1; }
+    }
     .game-container {
       width: 400px;
       height: 320px;
@@ -63,9 +79,12 @@
       font-family: 'Courier New', monospace;
       color: white;
       text-align: left;
+      display: flex;
+      flex-direction: column;
     }
     .scene {
       display: none;
+      flex-grow: 1; /* so scene area grows to fill container above the restart button */
     }
     .scene.active {
       display: block;
@@ -83,25 +102,29 @@
       border-top: 1px solid white;
       margin-top: 1rem;
       padding-top: 0.5rem;
+      font-size: 0.9rem;
     }
-    .blinking-cursor::after {
-      content: '_';
-      animation: blink 1s step-end infinite;
+
+    /* Big win/lose message */
+    .scene h2 {
+      font-size: 3rem;
+      color: #fff;
+      text-align: center;
+      margin-top: 2rem;
+      margin-bottom: 0;
     }
-    @keyframes blink {
-      from, to { opacity: 0; }
-      50% { opacity: 1; }
-    }
+
     .restart-btn {
-      position: absolute;
-      bottom: 10px;
-      right: 10px;
+      position: sticky;
+      bottom: 0;
       background: #000;
       color: white;
       border: 1px solid white;
-      padding: 0.3rem 0.5rem;
-      font-size: 0.8rem;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
       cursor: pointer;
+      margin-top: auto;
+      align-self: flex-end;
     }
     #scene10 img {
       width: 100%;
@@ -142,9 +165,8 @@
         content.innerHTML = '<p>[Text]</p>';
       } else if (section === 'games') {
         content.innerHTML = `
+          <div class="game-title blinking-cursor">Escape the Forest</div>
           <div class="game-container">
-            <h1>Escape the Forest <span class="blinking-cursor"></span></h1>
-
             <div id="scene1" class="scene active">
               <p>You wake up in a dark forest. Two paths lie ahead. You see a shiny object on the ground.</p>
               <button id="flashlightButton" onclick="pickUpFlashlight()">Pick up flashlight</button>
@@ -203,6 +225,7 @@
             <div class="inventory">
               <strong>Inventory:</strong> <span id="inventoryList">(empty)</span>
             </div>
+
             <button class="restart-btn" onclick="restartGame()">Restart</button>
           </div>
         `;
