@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Woozy's Website</title>
   <style>
+    /* Existing page styles */
     body {
       background-color: white;
       background-image: url('images/bg.png');
@@ -36,6 +37,7 @@
       text-decoration: none;
       color: blue;
       font-size: 1rem;
+      cursor: pointer;
     }
     nav a:hover {
       text-decoration: underline;
@@ -44,6 +46,70 @@
       font-size: 1rem;
       margin-top: 3rem;
       text-align: center;
+      min-height: 350px; /* to avoid page jump on game load */
+    }
+
+    /* Game styles */
+    .game-container {
+      width: 400px;
+      height: 320px;
+      padding: 1rem;
+      background-color: #000;
+      border: 2px solid white;
+      box-shadow: 0 0 10px white;
+      overflow-y: auto;
+      position: relative;
+      margin: 0 auto;
+      font-family: 'Courier New', monospace;
+      color: white;
+      text-align: left;
+    }
+    .scene {
+      display: none;
+    }
+    .scene.active {
+      display: block;
+    }
+    button {
+      background: #000;
+      color: white;
+      border: 1px solid white;
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+    }
+    .inventory {
+      border-top: 1px solid white;
+      margin-top: 1rem;
+      padding-top: 0.5rem;
+    }
+    .blinking-cursor::after {
+      content: '_';
+      animation: blink 1s step-end infinite;
+    }
+    @keyframes blink {
+      from, to { opacity: 0; }
+      50% { opacity: 1; }
+    }
+    .restart-btn {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: #000;
+      color: white;
+      border: 1px solid white;
+      padding: 0.3rem 0.5rem;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    #scene9 img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      margin: 0;
+      padding: 0;
+      display: block;
     }
   </style>
 </head>
@@ -69,19 +135,132 @@
   <script>
     function showContent(section) {
       const content = document.getElementById('content');
-      
-      // Change the content based on the clicked section
+
       if (section === 'home') {
         content.innerHTML = '<p>Hello World!</p>';
       } else if (section === 'about') {
         content.innerHTML = '<p>[Text]</p>';
       } else if (section === 'games') {
-        content.innerHTML = '<p>[Text]</p>';
+        content.innerHTML = `
+          <div class="game-container">
+            <h1>Escape the Forest <span class="blinking-cursor"></span></h1>
+
+            <div id="scene1" class="scene active">
+              <p>You wake up in a dark forest. Two paths lie ahead. You see a shiny object on the ground.</p>
+              <button id="flashlightButton" onclick="pickUpFlashlight()">Pick up flashlight</button>
+              <button onclick="goTo('scene2')">Take the left path</button>
+              <button onclick="goTo('scene3')">Take the right path</button>
+            </div>
+
+            <div id="scene2" class="scene">
+              <p>You find a friendly dog that wants to lead you out.</p>
+              <button onclick="goTo('scene4')">Follow the dog</button>
+              <button onclick="goTo('scene5')">Ignore the dog and walk alone</button>
+            </div>
+
+            <div id="scene3" class="scene">
+              <p>You stumble into a swamp. It's hard to move.</p>
+              <button onclick="goTo('scene5')">Try to push through</button>
+              <button onclick="goTo('scene6')">Turn back</button>
+            </div>
+
+            <div id="scene4" class="scene">
+              <p>The dog leads you to a cave. It's pitch black inside.</p>
+              <button onclick="useItem('flashlight', 'scene9', 'scene8')">Use flashlight</button>
+            </div>
+
+            <div id="scene5" class="scene">
+              <p>You get lost deeper in the forest and run out of supplies.</p>
+              <h2>You Lose.</h2>
+            </div>
+
+            <div id="scene6" class="scene">
+              <p>You manage to return to the fork, but night has fallen.</p>
+              <button onclick="goTo('scene5')">Sleep in the forest</button>
+              <button onclick="goTo('scene2')">Try the other path</button>
+            </div>
+
+            <div id="scene7" class="scene">
+              <p>With the flashlight, you find a tunnel that leads to safety.</p>
+              <h2>You Win!</h2>
+            </div>
+
+            <div id="scene8" class="scene">
+              <p>Without a light, you stumble in the dark and fall into a pit.</p>
+              <h2>You Lose.</h2>
+            </div>
+
+            <div id="scene9" class="scene">
+              <p>You light your way with the flashlight and see a hidden sign pointing to the exit tunnel.</p>
+              <img src="path-to-image.png" alt="Tunnel sign" />
+              <button onclick="goTo('scene7')">Enter the tunnel</button>
+            </div>
+
+            <div class="inventory">
+              <strong>Inventory:</strong> <span id="inventoryList">(empty)</span>
+            </div>
+            <button class="restart-btn" onclick="restartGame()">Restart</button>
+          </div>
+        `;
+
+        setupGame();
       } else if (section === 'art') {
         content.innerHTML = '<p>[Under Construction]</p>';
       }
     }
-  </script>
 
+    function setupGame() {
+      const inventory = new Set();
+
+      function goTo(sceneId) {
+        document.querySelectorAll('.scene').forEach(scene => {
+          scene.classList.remove('active');
+        });
+        document.getElementById(sceneId).classList.add('active');
+      }
+
+      function pickUpFlashlight() {
+        addItem('flashlight');
+        document.getElementById('flashlightButton').style.display = 'none';
+      }
+
+      function addItem(item) {
+        inventory.add(item);
+        updateInventoryDisplay();
+      }
+
+      function updateInventoryDisplay() {
+        const list = Array.from(inventory);
+        document.getElementById('inventoryList').textContent = list.length ? list.join(', ') : '(empty)';
+      }
+
+      function useItem(item, successScene, failScene) {
+        if (inventory.has(item)) {
+          goTo(successScene);
+        } else {
+          goTo(failScene);
+        }
+      }
+
+      function restartGame() {
+        inventory.clear();
+        updateInventoryDisplay();
+        document.getElementById('flashlightButton').style.display = 'inline-block';
+        goTo('scene1');
+      }
+
+      // Expose globally so buttons can call them
+      window.goTo = goTo;
+      window.pickUpFlashlight = pickUpFlashlight;
+      window.addItem = addItem;
+      window.useItem = useItem;
+      window.restartGame = restartGame;
+
+      restartGame();
+    }
+
+    // Initialize with Home content
+    showContent('home');
+  </script>
 </body>
 </html>
