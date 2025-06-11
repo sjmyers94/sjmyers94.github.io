@@ -55,16 +55,8 @@
       font-size: 1.8rem;
       text-align: center;
       margin-bottom: 1rem;
-      color: black;
+      color: black; /* Title is black now */
       position: relative;
-    }
-    .blinking-cursor::after {
-      content: '_';
-      animation: blink 1s step-end infinite;
-    }
-    @keyframes blink {
-      from, to { opacity: 0; }
-      50% { opacity: 1; }
     }
     .game-container {
       width: 400px;
@@ -73,18 +65,19 @@
       background-color: #000;
       border: 2px solid white;
       box-shadow: 0 0 10px white;
-      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
       position: relative;
       margin: 0 auto;
       font-family: 'Courier New', monospace;
       color: white;
       text-align: left;
-      display: flex;
-      flex-direction: column;
     }
     .scene {
       display: none;
-      flex-grow: 1; /* so scene area grows to fill container above the restart button */
+      flex-grow: 1;
+      overflow-y: auto; /* Scroll inside scene if needed */
+      margin-bottom: 0.5rem; /* space between buttons and inventory */
     }
     .scene.active {
       display: block;
@@ -100,20 +93,19 @@
     }
     .inventory {
       border-top: 1px solid white;
-      margin-top: 1rem;
+      margin-top: 0.5rem;
       padding-top: 0.5rem;
       font-size: 0.9rem;
+      flex-shrink: 0; /* Prevent shrinking */
     }
-
-    /* Big win/lose message */
-    .scene h2 {
-      font-size: 3rem;
-      color: #fff;
-      text-align: center;
-      margin-top: 2rem;
-      margin-bottom: 0;
+    .blinking-cursor::after {
+      content: '_';
+      animation: blink 1s step-end infinite;
     }
-
+    @keyframes blink {
+      from, to { opacity: 0; }
+      50% { opacity: 1; }
+    }
     .restart-btn {
       position: sticky;
       bottom: 0;
@@ -123,8 +115,9 @@
       padding: 0.5rem 1rem;
       font-size: 1rem;
       cursor: pointer;
-      margin-top: auto;
+      margin-top: 0.5rem;
       align-self: flex-end;
+      flex-shrink: 0;
     }
     #scene10 img {
       width: 100%;
@@ -133,6 +126,13 @@
       margin: 0;
       padding: 0;
       display: block;
+    }
+    /* Big win/lose message */
+    .win-lose-message {
+      font-size: 3rem;
+      text-align: center;
+      margin-top: 2rem;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -165,7 +165,7 @@
         content.innerHTML = '<p>[Text]</p>';
       } else if (section === 'games') {
         content.innerHTML = `
-          <div class="game-title blinking-cursor">Escape the Forest</div>
+          <div class="game-title">Escape the Forest <span class="blinking-cursor"></span></div>
           <div class="game-container">
             <div id="scene1" class="scene active">
               <p>You wake up in a dark forest. Two paths lie ahead. You see a shiny object on the ground.</p>
@@ -193,7 +193,7 @@
 
             <div id="scene5" class="scene">
               <p>You get lost deeper in the forest and run out of supplies.</p>
-              <h2>You Lose.</h2>
+              <h2 class="win-lose-message">You Lose.</h2>
             </div>
 
             <div id="scene6" class="scene">
@@ -203,13 +203,12 @@
             </div>
 
             <div id="scene7" class="scene">
-              <p>With the flashlight, you find a tunnel that leads to safety.</p>
-              <h2>You Win!</h2>
+              <h2 class="win-lose-message">You Win!</h2>
             </div>
 
             <div id="scene8" class="scene">
               <p>Without a light, you stumble in the dark and fall into a pit.</p>
-              <h2>You Lose.</h2>
+              <h2 class="win-lose-message">You Lose.</h2>
             </div>
 
             <div id="scene9" class="scene">
@@ -225,7 +224,6 @@
             <div class="inventory">
               <strong>Inventory:</strong> <span id="inventoryList">(empty)</span>
             </div>
-
             <button class="restart-btn" onclick="restartGame()">Restart</button>
           </div>
         `;
